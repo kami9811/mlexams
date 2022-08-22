@@ -18,7 +18,7 @@ def get_accuracy(
 ) -> float:
 
 
-    if model_kind == "scv":
+    if model_kind == "svc":
         # learning
         # clf = SVC(C=1, kernel='rbf', gamma='auto')
         clf = SVC(**options)
@@ -57,5 +57,7 @@ def get_accuracy(
             np.argmax(test_label, axis=1), 
             np.argmax(p, axis=1)
         )
+    else:
+      raise KeyError("input model kind has not been matched.")
 
     return accuracy
