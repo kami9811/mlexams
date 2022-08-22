@@ -15,7 +15,7 @@ def get_accuracy(
   options: Dict[str, Union[int, str]] = {
     "C": 5, "kernel": 'rbf', "gamma": 'auto'
   }
-):
+) -> float:
 
 
     if model_kind == "scv":
