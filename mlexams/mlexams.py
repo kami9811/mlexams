@@ -160,8 +160,7 @@ def get_accuracy(
                 t = t.to(device)
 
                 # 順伝播
-                y = model(x)
-                print(y.item(), t.item())
+                y = model.forward(x)
                 # 誤差の計算(クロスエントロピー誤差関数)
                 loss = criterion(y, t)
 
