@@ -142,7 +142,7 @@ def get_accuracy(
         
         # learning
         optimizer = optim.Adam(model.parameters(), lr=0.001)
-        criterion = nn.CrosEntropyLoss()
+        criterion = nn.CrossEntropyLoss()
         n_epochs = 100
         best_valid_loss = -1
         limit_patient = 5
