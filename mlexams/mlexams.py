@@ -156,7 +156,7 @@ def get_accuracy(
                 model.zero_grad()
 
                 # テンソルをGPUに移動
-                x = x.to(device)
+                x = x.float().to(device)
                 t = t.to(device)
 
                 # 順伝播
@@ -186,7 +186,7 @@ def get_accuracy(
             for x, t in valid_dataloader:
 
                 # テンソルをGPUに移動
-                x = x.to(device)
+                x = x.float().to(device)
                 t = t.to(device)
 
                 # 順伝播
