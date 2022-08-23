@@ -151,7 +151,7 @@ def get_accuracy(
         criterion = nn.CrossEntropyLoss()
         n_epochs = 100
         best_valid_loss = -1
-        limit_patient = 2
+        limit_patient = 5
         patient = 0
         for epoch in range(n_epochs):
 
