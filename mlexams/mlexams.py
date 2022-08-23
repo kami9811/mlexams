@@ -41,16 +41,18 @@ class MLP(nn.Module):
     def __init__(self, in_dim, hid_dim, out_dim):
         super(MLP, self).__init__()
         self.linear1 = nn.Linear(in_dim, hid_dim)
+        '''
         self.dropout1 = nn.Dropout(0.4)
         self.linear2 = nn.Linear(hid_dim, int(hid_dim / 2))
-        self.dropout2 = nn.Dropout(0.4)
-        self.linear3 = nn.Linear(int(hid_dim / 2), out_dim)
+        self.dropout2 = nn.Dropout(0.4)'''
+        self.linear3 = nn.Linear(hid_dim, out_dim)
 
     def forward(self, x):
         x = F.relu(self.linear1(x))
+        '''
         x = self.dropout1(x)
         x = F.relu(self.linear2(x))
-        x = self.dropout2(x)
+        x = self.dropout2(x)'''
         x = F.softmax(self.linear3(x), dim=1)
         return x
 
@@ -151,7 +153,7 @@ def get_accuracy(
         criterion = nn.CrossEntropyLoss()
         n_epochs = 100
         best_valid_loss = -1
-        limit_patient = 5
+        limit_patient = 30
         patient = 0
         for epoch in range(n_epochs):
 
@@ -208,7 +210,6 @@ def get_accuracy(
             else:
                 patient += 1
             if patient >= limit_patient:
-                print(epoch)
                 break
         model.eval()  # 評価時には勾配を計算しないevalモードにする
         # p = clf.predict(test_data)
