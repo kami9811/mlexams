@@ -141,7 +141,7 @@ def get_accuracy(
         model = MLP(**options).to(device)  # 500, 20
         
         # learning
-        optimizer = optim.Adam(model.parameters(), Ir=0.001)
+        optimizer = optim.Adam(model.parameters(), lr=0.001)
         criterion = nn.CrosEntropyLoss()
         n_epochs = 100
         best_valid_loss = -1
