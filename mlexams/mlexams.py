@@ -1,9 +1,53 @@
 # model libraries
+from operator import mod
 from sklearn.svm import SVC
 from sklearn.kernel_ridge import KernelRidge
+from sklearn.linear_model import LogisticRegression
+from sklearn.ensemble        import RandomForestClassifier
+# nn model libraries
+import torch
+import torch.nn as nn
+import torch.optim as optim
+import torch.nn.functional as F
+from torchvision.transforms import ToTensor, Lambda, Compose
+
 from sklearn.metrics import accuracy_score
+from sklearn.model_selection import train_test_split
 import numpy as np
 from typing import Dict, Union, List
+
+
+class MyDataset(torch.utils.data.Dataset):
+    def __init__(self, data, label, transform=None):
+        self.transform = transform
+        self.data = data
+        self.data_num = len(data)
+        self.label = label
+
+    def __len__(self):
+        return self.data_num
+
+    def __getitem__(self, idx):
+        if self.transform:
+          out_data = self.transform(self.data)[0][idx]
+          out_label = self.label[idx]
+        else:
+          out_data = self.data[idx]
+          out_label =  self.label[idx]
+
+        return out_data, out_label
+
+class MLP(nn.Module):
+    def __init__(self, in_dim, hid_dim, out_dim):
+        super(MLP, self).__init__()
+        self.linear1 = nn.Linear(in_dim, hid_dim)
+        self.linear2 = nn.Linear(hid_dim, out_dim)
+
+    def forward(self, x):
+        x = F.relu(self.linear1(x))
+        x = F.softmax(self.linear2(x))
+        return x
+
 
 def get_accuracy(
   train_data: any,
@@ -30,7 +74,7 @@ def get_accuracy(
             p
         )
 
-    if model_kind == "krr":
+    elif model_kind == "krr":
         # one-hot coding
         label_kind = label_kind
         train_label = (
@@ -49,7 +93,7 @@ def get_accuracy(
         )[test_label]
 
         # learning
-        clf = KernelRidge(alpha=0.2, kernel='rbf')
+        clf = KernelRidge(**options)
         clf.fit(train_data, train_label)
 
         p = clf.predict(test_data)
@@ -57,7 +101,147 @@ def get_accuracy(
             np.argmax(test_label, axis=1), 
             np.argmax(p, axis=1)
         )
+    
+    elif model_kind == "logistic":
+        
+        # learning
+        clf = LogisticRegression(**options)
+        clf.fit(train_data, train_label)
+
+        p = clf.predict(test_data)
+        accuracy = accuracy_score(
+            test_label,
+            p
+        )
+    
+    elif model_kind == "rf":
+        
+        # learning
+        clf = RandomForestClassifier(**options)
+        clf.fit(train_data, train_label)
+
+        p = clf.predict(test_data)
+        accuracy = accuracy_score(
+            test_label,
+            p
+        )
+    
+    elif model_kind == "mlp":
+        
+        # Dataset
+        valid_data, test_data, valid_label, test_label = train_test_split(
+            test_data, test_data, test_size=0.5, random_state=0
+        )
+        dataset_train = MyDataset(train_data, train_label, transforme=Compose([ToTensor()]))
+        dataset_valid = MyDataset(valid_data, valid_label, transforme=Compose([ToTensor()]))
+        train_dataloader = torch.utils.data.DataLoader(dataset_train, batch_size=int(len(train_label) / 10), shuffle=False)
+        valid_dataloader = torch.utils.data.DataLoader(dataset_valid, batch_size=int(len(valid_label) / 10), shuffle=False)
+        # Model
+        device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+        model = MLP(**options).to(device)  # 500, 20
+        
+        # learning
+        optimizer = optim.Adam(model.parameters(), Ir=0.001)
+        criterion = nn.CrosEntropyLoss()
+        n_epochs = 100
+        best_valid_loss = -1
+        limit_patient = 5
+        patient = 0
+        for epoch in range(n_epochs):
+
+            model.train()  # 訓練時には勾配を計算するtrainモードにする
+            for x, t in train_dataloader:
+
+                # 勾配の初期化
+                model.zero_grad()
+
+                # テンソルをGPUに移動
+                x = x.to(device)
+                t = t.to(device)
+
+                # 順伝播
+                y = model(x)
+
+                # 誤差の計算(クロスエントロピー誤差関数)
+                loss = criterion(y, t)
+
+                # 誤差の逆伝播
+                optimizer.zero_grad()
+                loss.backward()
+
+                # パラメータの更新
+                optimizer.step()
+
+                ''' # モデルの出力を予測値のスカラーに変換
+                pred = y.argmax(1)
+
+                losses_train.append(loss.tolist())
+
+                acc = torch.where(t - pred.to("cpu") == 0, torch.ones_like(t), torch.zeros_like(t))
+                train_num += acc.size()[0]
+                train_true_num += acc.sum().item()'''
+
+            model.eval()  # 評価時には勾配を計算しないevalモードにする
+            valid_loss_list = []
+            for x, t in valid_dataloader:
+
+                # テンソルをGPUに移動
+                x = x.to(device)
+                t = t.to(device)
+
+                # 順伝播
+                y = model.forward(x)
+
+                # 誤差の計算(クロスエントロピー誤差関数)
+                loss = criterion(y, t)
+                valid_loss_list.append(loss.item())
+
+            mean_loss = np.mean(valid_loss_list)
+            if best_valid_loss == -1 or best_valid_loss > mean_loss:
+                best_valid_loss = mean_loss
+                patient = 0
+            else:
+                patient += 1
+            if patient >= limit_patient:
+                break
+
+        # p = clf.predict(test_data)
+        outputs = model(torch.tensor(test_data, dtype=torch.float).to(device))
+        _, p = torch.max(outputs.data, dim=1)
+        accuracy = accuracy_score(
+            test_label,
+            p
+        )
+    
     else:
-      raise KeyError("input model kind has not been matched.")
+        raise KeyError("input model kind has not been matched.")
 
     return accuracy
+
+# def grid_search(
+#   train_data: any,
+#   train_label: any,
+#   label_kind: int,
+#   model_kind: str,
+#   options: Dict[str, Union[int, str]] = {
+#     "C": 5, "kernel": 'rbf', "gamma": 'auto'
+#   }
+# ) -> float:
+
+
+#     if model_kind == "rf":
+#         # learning
+#         # clf = SVC(C=1, kernel='rbf', gamma='auto')
+#         clf = SVC(**options)
+#         clf.fit(train_data, train_label)
+
+#         p = clf.predict(test_data)
+#         accuracy = accuracy_score(
+#             test_label,
+#             p
+#         )
+    
+#     else:
+#         raise KeyError("input model kind has not been matched.")
+
+#     return accuracy
