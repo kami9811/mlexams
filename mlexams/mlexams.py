@@ -45,7 +45,7 @@ class MLP(nn.Module):
 
     def forward(self, x):
         x = F.relu(self.linear1(x))
-        x = F.softmax(self.linear2(x))
+        x = F.softmax(self.linear2(x), dim=1)
         return x
 
 
@@ -130,7 +130,7 @@ def get_accuracy(
         
         # Dataset
         valid_data, test_data, valid_label, test_label = train_test_split(
-            test_data, test_data, test_size=0.5, random_state=0
+            test_data, test_label, test_size=0.5, random_state=0
         )
         dataset_train = MyDataset(train_data, train_label, transform=Compose([ToTensor()]))
         dataset_valid = MyDataset(valid_data, valid_label, transform=Compose([ToTensor()]))
@@ -207,6 +207,7 @@ def get_accuracy(
         # p = clf.predict(test_data)
         outputs = model(torch.tensor(test_data, dtype=torch.float).to(device))
         _, p = torch.max(outputs.data, dim=1)
+        p = p.to('cpu')
         accuracy = accuracy_score(
             test_label,
             p
