@@ -132,8 +132,8 @@ def get_accuracy(
         valid_data, test_data, valid_label, test_label = train_test_split(
             test_data, test_data, test_size=0.5, random_state=0
         )
-        dataset_train = MyDataset(train_data, train_label, transforme=Compose([ToTensor()]))
-        dataset_valid = MyDataset(valid_data, valid_label, transforme=Compose([ToTensor()]))
+        dataset_train = MyDataset(train_data, train_label, transform=Compose([ToTensor()]))
+        dataset_valid = MyDataset(valid_data, valid_label, transform=Compose([ToTensor()]))
         train_dataloader = torch.utils.data.DataLoader(dataset_train, batch_size=int(len(train_label) / 10), shuffle=False)
         valid_dataloader = torch.utils.data.DataLoader(dataset_valid, batch_size=int(len(valid_label) / 10), shuffle=False)
         # Model
