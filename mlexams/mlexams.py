@@ -195,7 +195,7 @@ def get_accuracy(
                 loss = criterion(y, t)
                 valid_loss_list.append(loss.item())
 
-            mean_loss = np.mean(valid_loss_list)@#
+            mean_loss = np.mean(valid_loss_list)
             if best_valid_loss == -1 or best_valid_loss > mean_loss:
                 best_valid_loss = mean_loss
                 patient = 0
