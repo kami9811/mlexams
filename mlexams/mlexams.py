@@ -137,8 +137,8 @@ def get_accuracy(
     elif model_kind == "mlp":
         
         # Dataset
-        valid_data, test_data, valid_label, test_label = train_test_split(
-            test_data, test_label, test_size=0.5, random_state=0
+        train_data, valid_data, train_label, valid_label = train_test_split(
+            train_data, train_label, test_size=0.25, random_state=0
         )
         dataset_train = MyDataset(train_data, train_label, transform=Compose([ToTensor()]))
         dataset_valid = MyDataset(valid_data, valid_label, transform=Compose([ToTensor()]))
@@ -153,7 +153,7 @@ def get_accuracy(
         criterion = nn.CrossEntropyLoss()
         n_epochs = 100
         best_valid_loss = -1
-        limit_patient = 30
+        limit_patient = 10
         patient = 0
         for epoch in range(n_epochs):
 
