@@ -50,11 +50,11 @@ class MLP(nn.Module):
         self.linear3 = nn.Linear(hid_dim // 2, hid_dim // 4)
         self.batchnorm3 = nn.BatchNorm1d(hid_dim // 4)
         self.dropout3 = nn.Dropout(0.4)
-        self.linear4 = nn.Linear(hid_dim // 4, hid_dim // 4)
-        self.batchnorm4 = nn.BatchNorm1d(hid_dim // 4)
+        self.linear4 = nn.Linear(hid_dim // 4, hid_dim // 8)
+        self.batchnorm4 = nn.BatchNorm1d(hid_dim // 8)
         self.dropout4 = nn.Dropout(0.4)
-        self.linear5 = nn.Linear(hid_dim // 4, hid_dim // 8)
-        self.batchnorm5 = nn.BatchNorm1d(hid_dim // 8)
+        self.linear5 = nn.Linear(hid_dim // 8, hid_dim // 16)
+        self.batchnorm5 = nn.BatchNorm1d(hid_dim // 16)
         self.dropout5 = nn.Dropout(0.4)
         '''
         self.dropout1 = nn.Dropout(0.4)
@@ -62,7 +62,7 @@ class MLP(nn.Module):
         self.dropout2 = nn.Dropout(0.4)'''
         # self.linear3 = nn.Linear(hid_dim, out_dim)
         # self.linear3 = nn.Linear(hid_dim // 2, out_dim)
-        self.linear6 = nn.Linear(hid_dim // 8, out_dim)
+        self.linear6 = nn.Linear(hid_dim // 16, out_dim)
 
     def forward(self, x):
         # x = F.relu(self.linear1(x))
