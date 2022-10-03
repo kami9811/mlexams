@@ -44,14 +44,15 @@ class MLP(nn.Module):
         self.batchnorm1 = nn.BatchNorm1d(hid_dim)
         self.dropout1 = nn.Dropout(0.4)
 
-        self.linear2 = nn.Linear(hid_dim, hid_dim)
-        self.batchnorm2 = nn.BatchNorm1d(hid_dim)
+        self.linear2 = nn.Linear(hid_dim, hid_dim // 2)
+        self.batchnorm2 = nn.BatchNorm1d(hid_dim // 2)
         self.dropout2 = nn.Dropout(0.4)
         '''
         self.dropout1 = nn.Dropout(0.4)
         self.linear2 = nn.Linear(hid_dim, int(hid_dim / 2))
         self.dropout2 = nn.Dropout(0.4)'''
-        self.linear3 = nn.Linear(hid_dim, out_dim)
+        # self.linear3 = nn.Linear(hid_dim, out_dim)
+        self.linear3 = nn.Linear(hid_dim // 2, out_dim)
 
     def forward(self, x):
         # x = F.relu(self.linear1(x))
