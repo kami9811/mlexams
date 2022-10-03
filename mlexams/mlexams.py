@@ -165,13 +165,13 @@ def get_accuracy(
     elif model_kind == "mlp":
         
         # Dataset
-        train_data, valid_data, train_label, valid_label = train_test_split(
-            train_data, train_label, test_size=0.125, random_state=0
-        )
+        # train_data, valid_data, train_label, valid_label = train_test_split(
+        #     train_data, train_label, test_size=0.125, random_state=0
+        # )
         dataset_train = MyDataset(train_data, train_label, transform=Compose([ToTensor()]))
-        dataset_valid = MyDataset(valid_data, valid_label, transform=Compose([ToTensor()]))
+        # dataset_valid = MyDataset(valid_data, valid_label, transform=Compose([ToTensor()]))
         train_dataloader = torch.utils.data.DataLoader(dataset_train, batch_size=int(len(train_label) / 10), shuffle=False)
-        valid_dataloader = torch.utils.data.DataLoader(dataset_valid, batch_size=int(len(valid_label) / 10), shuffle=False)
+        # valid_dataloader = torch.utils.data.DataLoader(dataset_valid, batch_size=int(len(valid_label) / 10), shuffle=False)
         # Model
         device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         model = MLP(**options).to(device)  # 500, 20
@@ -180,12 +180,14 @@ def get_accuracy(
         optimizer = optim.Adam(model.parameters(), lr=0.001)
         criterion = nn.CrossEntropyLoss()
         n_epochs = 400
-        best_valid_loss = -1
+        best_train_loss = -1
+        # best_valid_loss = -1
         limit_patient = 40
         patient = 0
         for epoch in range(n_epochs):
 
             model.train()  # 訓練時には勾配を計算するtrainモードにする
+            train_loss_list = []
             for x, t in train_dataloader:
 
                 # 勾配の初期化
@@ -199,6 +201,7 @@ def get_accuracy(
                 y = model.forward(x)
                 # 誤差の計算(クロスエントロピー誤差関数)
                 loss = criterion(y, t)
+                train_loss_list.append(loss.item())
 
                 # 誤差の逆伝播
                 optimizer.zero_grad()
@@ -216,6 +219,7 @@ def get_accuracy(
                 train_num += acc.size()[0]
                 train_true_num += acc.sum().item()'''
 
+            '''
             model.eval()  # 評価時には勾配を計算しないevalモードにする
             valid_loss_list = []
             for x, t in valid_dataloader:
@@ -229,11 +233,15 @@ def get_accuracy(
 
                 # 誤差の計算(クロスエントロピー誤差関数)
                 loss = criterion(y, t)
-                valid_loss_list.append(loss.item())
-
-            mean_loss = np.mean(valid_loss_list)
-            if best_valid_loss == -1 or best_valid_loss > mean_loss:
-                best_valid_loss = mean_loss
+                valid_loss_list.append(loss.item())'''
+            
+            mean_loss = np.mean(train_loss_list)
+            # mean_loss = np.mean(valid_loss_list)
+            # if best_valid_loss == -1 or best_valid_loss > mean_loss:
+            #     best_valid_loss = mean_loss
+            #     patient = 0
+            if best_train_loss == -1 or best_train_loss > mean_loss:
+                best_train_loss = mean_loss
                 patient = 0
             else:
                 patient += 1
