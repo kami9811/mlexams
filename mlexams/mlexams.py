@@ -151,7 +151,7 @@ def get_accuracy(
         
         # Dataset
         train_data, valid_data, train_label, valid_label = train_test_split(
-            train_data, train_label, test_size=0.25, random_state=0
+            train_data, train_label, test_size=0.125, random_state=0
         )
         dataset_train = MyDataset(train_data, train_label, transform=Compose([ToTensor()]))
         dataset_valid = MyDataset(valid_data, valid_label, transform=Compose([ToTensor()]))
@@ -166,7 +166,7 @@ def get_accuracy(
         criterion = nn.CrossEntropyLoss()
         n_epochs = 200
         best_valid_loss = -1
-        limit_patient = 20
+        limit_patient = 40
         patient = 0
         for epoch in range(n_epochs):
 
