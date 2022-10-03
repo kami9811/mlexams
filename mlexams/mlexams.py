@@ -44,22 +44,25 @@ class MLP(nn.Module):
         self.batchnorm1 = nn.BatchNorm1d(hid_dim)
         self.dropout1 = nn.Dropout(0.4)
 
-        self.linear2 = nn.Linear(hid_dim, hid_dim // 1)
-        self.batchnorm2 = nn.BatchNorm1d(hid_dim // 1)
+        self.linear2 = nn.Linear(hid_dim, hid_dim // 2)
+        self.batchnorm2 = nn.BatchNorm1d(hid_dim // 2)
         self.dropout2 = nn.Dropout(0.4)
-        self.linear3 = nn.Linear(hid_dim // 1, hid_dim // 2)
-        self.batchnorm3 = nn.BatchNorm1d(hid_dim // 2)
+        self.linear3 = nn.Linear(hid_dim // 2, hid_dim // 4)
+        self.batchnorm3 = nn.BatchNorm1d(hid_dim // 4)
         self.dropout3 = nn.Dropout(0.4)
-        self.linear4 = nn.Linear(hid_dim // 2, hid_dim // 4)
+        self.linear4 = nn.Linear(hid_dim // 4, hid_dim // 4)
         self.batchnorm4 = nn.BatchNorm1d(hid_dim // 4)
         self.dropout4 = nn.Dropout(0.4)
+        self.linear5 = nn.Linear(hid_dim // 4, hid_dim // 8)
+        self.batchnorm5 = nn.BatchNorm1d(hid_dim // 8)
+        self.dropout5 = nn.Dropout(0.4)
         '''
         self.dropout1 = nn.Dropout(0.4)
         self.linear2 = nn.Linear(hid_dim, int(hid_dim / 2))
         self.dropout2 = nn.Dropout(0.4)'''
         # self.linear3 = nn.Linear(hid_dim, out_dim)
         # self.linear3 = nn.Linear(hid_dim // 2, out_dim)
-        self.linear5 = nn.Linear(hid_dim // 4, out_dim)
+        self.linear6 = nn.Linear(hid_dim // 8, out_dim)
 
     def forward(self, x):
         # x = F.relu(self.linear1(x))
@@ -76,12 +79,15 @@ class MLP(nn.Module):
         x = self.linear4(x)
         x = F.relu(self.batchnorm4(x))
         x = self.dropout4(x)
+        x = self.linear5(x)
+        x = F.relu(self.batchnorm5(x))
+        x = self.dropout5(x)
         '''
         x = self.dropout1(x)
         x = F.relu(self.linear2(x))
         x = self.dropout2(x)'''
         # x = F.softmax(self.linear3(x), dim=1)
-        x = F.softmax(self.linear5(x), dim=1)
+        x = F.softmax(self.linear6(x), dim=1)
         return x
 
 
