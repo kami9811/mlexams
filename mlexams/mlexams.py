@@ -59,7 +59,7 @@ class MLP(nn.Module):
         self.dropout2 = nn.Dropout(0.4)'''
         # self.linear3 = nn.Linear(hid_dim, out_dim)
         # self.linear3 = nn.Linear(hid_dim // 2, out_dim)
-        self.linear5 = nn.Linear(hid_dim // 8, out_dim)
+        self.linear5 = nn.Linear(hid_dim // 4, out_dim)
 
     def forward(self, x):
         # x = F.relu(self.linear1(x))
