@@ -188,7 +188,7 @@ def get_accuracy(
         p = clf.predict(test_data)
         accuracy = accuracy_score(
             test_label,
-            p
+            p.get()
         )
     
     elif model_kind == "mlp":
