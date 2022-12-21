@@ -11,10 +11,10 @@ import torch.optim as optim
 import torch.nn.functional as F
 from torchvision.transforms import ToTensor, Lambda, Compose
 # gpu libraries
-import cupy as cp
-from cuml.ensemble import RandomForestClassifier as cuRFC
-from cuml.svm import SVC as cuSVC
-from cuml.metrics.accuracy import accuracy_score as cu_accuracy_score
+# import cupy as cp
+# from cuml.ensemble import RandomForestClassifier as cuRFC
+# from cuml.svm import SVC as cuSVC
+# from cuml.metrics.accuracy import accuracy_score as cu_accuracy_score
 
 from sklearn.metrics import accuracy_score
 from sklearn.model_selection import train_test_split
@@ -113,41 +113,41 @@ def get_accuracy(
     if model_kind == "svc":
         # learning
         # clf = SVC(C=1, kernel='rbf', gamma='auto')
-        # clf = SVC(**options)
+        clf = SVC(**options)
 
-        # clf.fit(train_data, train_label)
+        clf.fit(train_data, train_label)
 
-        # p = clf.predict(test_data)
-        # accuracy = accuracy_score(
-        #     test_label,
-        #     p
-        # )
+        p = clf.predict(test_data)
+        accuracy = accuracy_score(
+            test_label,
+            p
+        )
 
-        if not on_gpu:
-            clf = SVC(**options)
+        # if not on_gpu:
+        #     clf = SVC(**options)
 
-            clf.fit(train_data, train_label)
+        #     clf.fit(train_data, train_label)
 
-            p = clf.predict(test_data)
-            accuracy = accuracy_score(
-                test_label,
-                p
-            )
-        else:
-            train_data = cp.asarray(train_data)
-            train_label = cp.asarray(train_label)
-            test_data = cp.asarray(test_data)
-            test_label = cp.asarray(test_label)
+        #     p = clf.predict(test_data)
+        #     accuracy = accuracy_score(
+        #         test_label,
+        #         p
+        #     )
+        # else:
+        #     train_data = cp.asarray(train_data)
+        #     train_label = cp.asarray(train_label)
+        #     test_data = cp.asarray(test_data)
+        #     test_label = cp.asarray(test_label)
 
-            clf = cuSVC(**options)
+        #     clf = cuSVC(**options)
             
-            clf.fit(train_data, train_label)
+        #     clf.fit(train_data, train_label)
 
-            p = clf.predict(test_data)
-            accuracy = cu_accuracy_score(
-                test_label,
-                p
-            )
+        #     p = clf.predict(test_data)
+        #     accuracy = cu_accuracy_score(
+        #         test_label,
+        #         p
+        #     )
 
     elif model_kind == "krr":
         # one-hot coding
