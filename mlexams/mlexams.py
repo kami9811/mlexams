@@ -176,10 +176,10 @@ def get_accuracy(
         if not on_gpu:
             clf = RandomForestClassifier(**options)
         else:
-            train_data = cp.asarray(train_data)
-            train_label = cp.asarray(train_label)
-            test_data = cp.asarray(test_data)
-            test_label = cp.asarray(test_label)
+            # train_data = cp.asarray(train_data)
+            # train_label = cp.asarray(train_label)
+            # test_data = cp.asarray(test_data)
+            # test_label = cp.asarray(test_label)
 
             clf = cuRFC(**options)
             
