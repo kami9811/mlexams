@@ -14,7 +14,7 @@ from torchvision.transforms import ToTensor, Lambda, Compose
 import cupy as cp
 from cuml.ensemble import RandomForestClassifier as cuRFC
 from cuml.svm import SVC as cuSVC
-import cuml.metrics.accuracy.accuracy_score as cu_accuracy_score
+from cuml.metrics.accuracy import accuracy_score as cu_accuracy_score
 
 from sklearn.metrics import accuracy_score
 from sklearn.model_selection import train_test_split
