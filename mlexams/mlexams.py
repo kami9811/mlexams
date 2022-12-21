@@ -112,9 +112,27 @@ def get_accuracy(
 
     if model_kind == "svc":
         # learning
+        # clf = SVC(C=1, kernel='rbf', gamma='auto')
+        # clf = SVC(**options)
+
+        # clf.fit(train_data, train_label)
+
+        # p = clf.predict(test_data)
+        # accuracy = accuracy_score(
+        #     test_label,
+        #     p
+        # )
+
         if not on_gpu:
-            # clf = SVC(C=1, kernel='rbf', gamma='auto')
             clf = SVC(**options)
+
+            clf.fit(train_data, train_label)
+
+            p = clf.predict(test_data)
+            accuracy = accuracy_score(
+                test_label,
+                p
+            )
         else:
             train_data = cp.asarray(train_data)
             train_label = cp.asarray(train_label)
@@ -122,14 +140,14 @@ def get_accuracy(
             test_label = cp.asarray(test_label)
 
             clf = cuSVC(**options)
+            
+            clf.fit(train_data, train_label)
 
-        clf.fit(train_data, train_label)
-
-        p = clf.predict(test_data)
-        accuracy = accuracy_score(
-            test_label,
-            p
-        )
+            p = clf.predict(test_data)
+            accuracy = cu_accuracy_score(
+                test_label,
+                p
+            )
 
     elif model_kind == "krr":
         # one-hot coding
@@ -174,31 +192,40 @@ def get_accuracy(
     elif model_kind == "rf":
         
         # learning
-        if not on_gpu:
-            clf = RandomForestClassifier(**options)
+        clf = RandomForestClassifier(**options)
 
-            clf.fit(train_data, train_label)
+        clf.fit(train_data, train_label)
 
-            p = clf.predict(test_data)
-            accuracy = accuracy_score(
-                test_label,
-                p
-            )
-        else:
-            train_data = cp.asarray(train_data)
-            train_label = cp.asarray(train_label)
-            test_data = cp.asarray(test_data)
-            test_label = cp.asarray(test_label)
+        p = clf.predict(test_data)
+        accuracy = accuracy_score(
+            test_label,
+            p
+        )
+        # if not on_gpu:
+        #     clf = RandomForestClassifier(**options)
 
-            clf = cuRFC(**options)
+        #     clf.fit(train_data, train_label)
+
+        #     p = clf.predict(test_data)
+        #     accuracy = accuracy_score(
+        #         test_label,
+        #         p
+        #     )
+        # else:
+        #     train_data = cp.asarray(train_data)
+        #     train_label = cp.asarray(train_label)
+        #     test_data = cp.asarray(test_data)
+        #     test_label = cp.asarray(test_label)
+
+        #     clf = cuRFC(**options)
             
-            clf.fit(train_data, train_label)
+        #     clf.fit(train_data, train_label)
 
-            p = clf.predict(test_data)
-            accuracy = cu_accuracy_score(
-                test_label,
-                p
-            )
+        #     p = clf.predict(test_data)
+        #     accuracy = cu_accuracy_score(
+        #         test_label,
+        #         p
+        #     )
     
     elif model_kind == "mlp":
         
