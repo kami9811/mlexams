@@ -3,13 +3,17 @@ from operator import mod
 from sklearn.svm import SVC
 from sklearn.kernel_ridge import KernelRidge
 from sklearn.linear_model import LogisticRegression
-from sklearn.ensemble        import RandomForestClassifier
+from sklearn.ensemble import RandomForestClassifier
 # nn model libraries
 import torch
 import torch.nn as nn
 import torch.optim as optim
 import torch.nn.functional as F
 from torchvision.transforms import ToTensor, Lambda, Compose
+# gpu libraries
+import cupy as cp
+from cuml.ensemble import RandomForestClassifier as cuRFC
+from cuml.svm import SVC as cuSVC
 
 from sklearn.metrics import accuracy_score
 from sklearn.model_selection import train_test_split
@@ -100,14 +104,24 @@ def get_accuracy(
   model_kind: str,
   options: Dict[str, Union[int, str]] = {
     "C": 5, "kernel": 'rbf', "gamma": 'auto'
-  }
+  },
+  on_gpu: bool = False,
 ) -> float:
 
 
     if model_kind == "svc":
         # learning
-        # clf = SVC(C=1, kernel='rbf', gamma='auto')
-        clf = SVC(**options)
+        if not on_gpu:
+            # clf = SVC(C=1, kernel='rbf', gamma='auto')
+            clf = SVC(**options)
+        else:
+            train_data = cp.asarray(train_data)
+            train_label = cp.asarray(train_label)
+            test_data = cp.asarray(test_data)
+            test_label = cp.asarray(test_label)
+
+            clf = cuSVC(**options)
+
         clf.fit(train_data, train_label)
 
         p = clf.predict(test_data)
@@ -159,7 +173,16 @@ def get_accuracy(
     elif model_kind == "rf":
         
         # learning
-        clf = RandomForestClassifier(**options)
+        if not on_gpu:
+            clf = RandomForestClassifier(**options)
+        else:
+            train_data = cp.asarray(train_data)
+            train_label = cp.asarray(train_label)
+            test_data = cp.asarray(test_data)
+            test_label = cp.asarray(test_label)
+
+            clf = cuRFC(**options)
+            
         clf.fit(train_data, train_label)
 
         p = clf.predict(test_data)
