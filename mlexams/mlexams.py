@@ -186,6 +186,7 @@ def get_accuracy(
         clf.fit(train_data, train_label)
 
         p = clf.predict(test_data)
+        print(p, type(p))
         accuracy = accuracy_score(
             test_label,
             p.get()
