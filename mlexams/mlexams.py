@@ -11,10 +11,10 @@ import torch.optim as optim
 import torch.nn.functional as F
 from torchvision.transforms import ToTensor, Lambda, Compose
 # gpu libraries
-# import cupy as cp
-# from cuml.ensemble import RandomForestClassifier as cuRFC
-# from cuml.svm import SVC as cuSVC
-# from cuml.metrics.accuracy import accuracy_score as cu_accuracy_score
+import cupy as cp
+from cuml.ensemble import RandomForestClassifier as cuRFC
+from cuml.svm import SVC as cuSVC
+from cuml.metrics.accuracy import accuracy_score as cu_accuracy_score
 
 from sklearn.metrics import accuracy_score
 from sklearn.model_selection import train_test_split
