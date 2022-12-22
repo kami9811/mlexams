@@ -230,31 +230,20 @@ def get_accuracy(
     elif model_kind == "curf":
         
         # learning
-        if not on_gpu:
-            clf = RandomForestClassifier(**options)
+        train_data = cp.asarray(train_data)
+        train_label = cp.asarray(train_label)
+        test_data = cp.asarray(test_data)
+        test_label = cp.asarray(test_label)
 
-            clf.fit(train_data, train_label)
+        clf = cuRFC(**options)
+        
+        clf.fit(train_data, train_label)
 
-            p = clf.predict(test_data)
-            accuracy = accuracy_score(
-                test_label,
-                p
-            )
-        else:
-            train_data = cp.asarray(train_data)
-            train_label = cp.asarray(train_label)
-            test_data = cp.asarray(test_data)
-            test_label = cp.asarray(test_label)
-
-            clf = cuRFC(**options)
-            
-            clf.fit(train_data, train_label)
-
-            p = clf.predict(test_data)
-            accuracy = cu_accuracy_score(
-                test_label,
-                p
-            )
+        p = clf.predict(test_data)
+        accuracy = cu_accuracy_score(
+            test_label,
+            p
+        )
     
     elif model_kind == "mlp":
         
